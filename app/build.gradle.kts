@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ch.ost.rj.mge.isstracker"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ch.ost.rj.mge.isstracker"
