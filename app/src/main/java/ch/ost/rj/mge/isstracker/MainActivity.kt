@@ -1,6 +1,9 @@
 package ch.ost.rj.mge.isstracker
 
 
+import android.app.Application
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -8,12 +11,16 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.ost.rj.mge.isstracker.databinding.ActivityMainBinding
-import ch.ost.rj.mge.isstracker.ui.home.HomeFragment
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.osmdroid.config.Configuration.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityMainBinding
 
@@ -23,7 +30,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val ctx = applicationContext
 
+        //Configuration.getInstance().load(ctx, getPreferences(Context.MODE_PRIVATE))
 
         val navView: BottomNavigationView = binding.navView
 
@@ -36,10 +45,15 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
+
+
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
     }
+
+
 
 
 

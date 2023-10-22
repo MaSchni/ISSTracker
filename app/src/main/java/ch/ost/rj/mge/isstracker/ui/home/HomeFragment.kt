@@ -9,22 +9,31 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import ch.ost.rj.mge.isstracker.R
 import ch.ost.rj.mge.isstracker.databinding.FragmentHomeBinding
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapFragment
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.BoundingBox
+import org.osmdroid.config.Configuration.*
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import java.io.IOException
-import org.osmdroid.config.Configuration.*
+import androidx.fragment.app.FragmentTransaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentHomeBinding? = null
 
@@ -32,7 +41,7 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private lateinit var map : MapView
+    private lateinit var map : GoogleMap
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,20 +61,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        map = view.findViewById<MapView>(R.id.osmmap)
-        map.setTileSource(TileSourceFactory.MAPNIK)
-        map.setScrollableAreaLimitDouble(BoundingBox(85.0, 180.0, -85.0, -180.0))
-        map.maxZoomLevel = 200.0
-        map.minZoomLevel = 4.0
-        map.isHorizontalMapRepetitionEnabled = false
-        map.isVerticalMapRepetitionEnabled = false
-        map.setScrollableAreaLimitLatitude(
-            MapView.getTileSystem().maxLatitude,
-            MapView.getTileSystem().minLatitude,
-            0
-        )
 
-        updateMap()
+        val mapFragment = childFragmentManager.fragments[0] as SupportMapFragment?
+        mapFragment!!.getMapAsync(this)
     }
 
     override fun onDestroyView() {
@@ -73,62 +71,43 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun updateMap(){
-        val posISS = mutableMapOf<String, String>()
 
-        val request = Request.Builder()
-            .url("http://api.open-notify.org/iss-now.json")
-            .build()
+    fun getPosData(url: String, onResponse: (Double, Double) -> Unit){
         val client = OkHttpClient()
+        val request = Request.Builder().url(url).build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
+        GlobalScope.launch(Dispatchers.IO){
+            try{
+                val response = client.newCall(request).execute()
+                if(response.isSuccessful){
+                    val responseBody = response.body?.string()
+                    val jObject = JSONObject(JSONObject(responseBody).get("iss_position").toString());
+                    val latitude = jObject.get("latitude").toString().toDouble()
+                    val longitude = jObject.get("longitude").toString().toDouble()
+
+                    withContext(Dispatchers.Main){
+                        onResponse(latitude, longitude)
+                    }
+                }
+            } catch (e: Exception){
                 e.printStackTrace()
             }
+        }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                    val responseBody= response.body!!.string()
-                    val jObject = JSONObject(JSONObject(responseBody).get("iss_position").toString());
-                    posISS["longitude"] = jObject.get("longitude").toString()
-                    posISS["latitude"] = jObject.get("latitude").toString()
-                    val geoPoint = GeoPoint(posISS["latitude"]!!.toDouble(), posISS["longitude"]!!.toDouble())
-                    addISSIcon(geoPoint)
-
-                }
-            }
-
-        })
     }
 
-    override fun onResume() {
-        super.onResume()
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
-        map.onResume() //needed for compass, my location overlays, v6.0.0 and up
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        getPosData("http://api.open-notify.org/iss-now.json") {latitude, longitude ->
+            val position = LatLng(latitude,longitude)
+            googleMap.addMarker(
+                MarkerOptions()
+                    .position(position)
+                    .title("Marker")
+            )
+        }
+        /**/
     }
 
-    override fun onPause() {
-        super.onPause()
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().save(this, prefs);
-        map.onPause()  //needed for compass, my location overlays, v6.0.0 and up
-    }
 
-    fun addISSIcon(geoPoint: GeoPoint){
-        val marker = Marker(map)
-        marker.position = geoPoint
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        //marker.icon = resources.getDrawable(R.drawable.fire)
-        map.overlays.clear()
-        map.overlays.add(marker)
-        map.invalidate()
-        marker.title = "Test"
-        Log.d("json", marker.toString())
-    }
 }
