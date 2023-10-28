@@ -17,7 +17,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import org.osmdroid.config.Configuration.*
 
 
 class MainActivity : AppCompatActivity(){

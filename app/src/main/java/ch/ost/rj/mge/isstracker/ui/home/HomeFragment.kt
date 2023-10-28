@@ -21,12 +21,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import org.osmdroid.config.Configuration.*
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
 import java.io.IOException
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.gms.maps.model.Marker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -42,6 +39,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
 
     private lateinit var map : GoogleMap
+
+    private var issMarker: Marker? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,15 +97,19 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        setMarker(map)
+    }
+
+    fun setMarker(googleMap: GoogleMap){
+        issMarker?.remove();
         getPosData("http://api.open-notify.org/iss-now.json") {latitude, longitude ->
             val position = LatLng(latitude,longitude)
-            googleMap.addMarker(
+            issMarker = googleMap.addMarker(
                 MarkerOptions()
                     .position(position)
                     .title("Marker")
             )
         }
-        /**/
     }
 
 
