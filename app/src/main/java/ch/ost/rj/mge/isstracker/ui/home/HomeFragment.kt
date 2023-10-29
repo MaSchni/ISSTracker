@@ -71,7 +71,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    fun getPosData(url: String, onResponse: (Double, Double) -> Unit) {
+    fun getPosData(onResponse: (Double, Double) -> Unit) {
+        val url = "http://api.open-notify.org/iss-now.json"
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 
@@ -80,7 +81,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 val response = client.newCall(request).execute()
                 if(response.isSuccessful){
                     val responseBody = response.body?.string()
-                    val jObject = JSONObject(JSONObject(responseBody).get("iss_position").toString());
+                    val jObject = JSONObject(JSONObject(responseBody).get("iss_position").toString())
                     val latitude = jObject.get("latitude").toString().toDouble()
                     val longitude = jObject.get("longitude").toString().toDouble()
 
@@ -102,7 +103,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
 
     fun setMarker(googleMap: GoogleMap) {
         issMarker?.remove();
-        getPosData("http://api.open-notify.org/iss-now.json") {latitude, longitude ->
+        getPosData() {latitude, longitude ->
             val position = LatLng(latitude,longitude)
             issMarker = googleMap.addMarker(
                 MarkerOptions()
