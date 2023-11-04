@@ -43,12 +43,9 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getPeopleInSpace(){numberOfPeople ->
-            // Todo: Show number of People in space on screen
-            val textView = getView()?.findViewById<TextView>(R.id.information_textView)
-            textView?.text = getString(R.string.info_text)
-        }
 
+        val textView = getView()?.findViewById<TextView>(R.id.information_textView)
+        textView?.text = getString(R.string.info_text)
     }
 
     override fun onDestroyView() {
@@ -56,29 +53,4 @@ class DashboardFragment : Fragment() {
         _binding = null
     }
 
-    fun getPeopleInSpace(onResponse: (String) -> Unit) {
-        val url = "http://api.open-notify.org/astros.json"
-        val client = OkHttpClient()
-        val request = Request.Builder().url(url).build()
-
-        GlobalScope.launch(Dispatchers.IO){
-            try{
-                val response = client.newCall(request).execute()
-                if(response.isSuccessful){
-                    val responseBody = response.body?.string()
-
-                    val jObject = JSONObject(responseBody)
-
-                    val numberOfPeople = jObject.get("number").toString()
-
-                    withContext(Dispatchers.Main){
-                        onResponse(numberOfPeople)
-                    }
-                }
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
-
-    }
 }
