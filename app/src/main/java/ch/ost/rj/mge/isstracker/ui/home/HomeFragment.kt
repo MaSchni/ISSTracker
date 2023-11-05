@@ -71,6 +71,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     }
 
 
+    // Get ISS Positional data
     fun getPosData(onResponse: (Double, Double) -> Unit) {
         val url = "http://api.open-notify.org/iss-now.json"
         val client = OkHttpClient()

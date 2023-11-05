@@ -43,9 +43,6 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val textView = getView()?.findViewById<TextView>(R.id.information_textView)
-        textView?.text = getString(R.string.info_text)
     }
 
     override fun onDestroyView() {
