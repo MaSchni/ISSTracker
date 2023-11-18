@@ -10,9 +10,15 @@ Auf dem Informationen-Tab ist ein kurzer Text über die ISS zu sehen.
 
 ## Lokalisierung
 Die App ist in deutscher und englischer Sprache verfügbar.
+<br>
+<img src="/screenshots/Screenshot_20231105_125331_ISSTracker.jpg" width="200"/>
+<img src="/screenshots/Screenshot_20231105_125425_ISSTracker.jpg" width="200"/>
 
 ## Styles
 Es gibt ein Lightmode- und ein Darkmode-Theme.
+<br>
+<img src="/screenshots/Screenshot_20231105_125321_ISSTracker.jpg" width="200"/>
+<img src="/screenshots/Screenshot_20231105_125314_ISSTracker.jpg" width="200"/>
 
 ## Auflistung für das erreichen der Mindestpunktzahl
 | Feature | Bewertung |
