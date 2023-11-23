@@ -1,6 +1,6 @@
 # ISSTracker
 
-Mit dieser App kann man die aktuelle Position der Internationalen Raumstation (ISS) auf einer Karte einsehen. Zusätzliche bietet die Apps Informationen rund um die ISS.
+Mit dieser App kann man die aktuelle Position der Internationalen Raumstation (ISS) auf einer Karte einsehen. Zusätzliche bietet die App Informationen rund um die ISS.
 
 ## Startseite
 Auf der Startseite befindet sich eine Karte mit einem roten Pin. Dieser Pin zeigt die aktuelle Position der ISS. Für die Positionsdaten verwendet die App die [Open Notifiy API](http://open-notify.org/).
